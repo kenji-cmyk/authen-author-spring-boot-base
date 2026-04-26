@@ -32,4 +32,9 @@ public class User {
 
     @Column(nullable = false)
     private String providerId;
+
+    @Column
+    private String refreshToken;
+
+    
 }

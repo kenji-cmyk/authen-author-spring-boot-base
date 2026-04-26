@@ -30,9 +30,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String provider = oauthToken.getAuthorizedClientRegistrationId();
         Map<String, Object> attributes = oauthUser.getAttributes();
         String email = (String) attributes.get("email");
-        String providerId = oauthUser.getName(); // Numeric ID for GitHub, Sub for Google
-        
-        // Handle GitHub specific 'login' if email is private
+        String providerId = oauthUser.getName(); 
+
         String loginName = (String) attributes.get("login");
         String username = (email != null) ? email : (loginName != null ? loginName : providerId);
 
@@ -49,7 +48,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 });
 
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateAccessToken(user);
         String targetUrl = "/home?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }

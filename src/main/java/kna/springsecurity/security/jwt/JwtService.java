@@ -27,8 +27,11 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.refresh-expiration}")
+    private long refreshTokenExpiration;
 
-    public String generateToken(User user) {
+
+    public String generateAccessToken(User user) {
        Map<String, Object> claims = new HashMap<>();
        claims.put("roles", user.getRoles());
        return createToken(claims, user.getUsername());
@@ -66,11 +69,31 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
+        if (token == null || token.trim().isEmpty()) {
+            throw new IllegalArgumentException("Token cannot be null or empty");
+        }
         return Jwts.parser()
                 .verifyWith((SecretKey) getSignKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private String createRefreshToken (Map<String, Object> claims, String username){
+        return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(username)
+            .setIssuer("Authen-Author-Base")
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+            .signWith(getSignKey())
+            .compact();
+
+    }
+
+    public String generateRefreshToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        return createRefreshToken(claims, user.getUsername());
     }
 
     private Boolean isTokenExpired(String token) {
