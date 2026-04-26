@@ -7,6 +7,7 @@ import kna.springsecurity.dto.UserDTO.RegisterResponse;
 import kna.springsecurity.entity.User;
 import kna.springsecurity.repository.UserRepository;
 import kna.springsecurity.service.AuthService;
+import kna.springsecurity.security.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+        private final JwtService jwtService;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -34,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
 
         return LoginResponse.builder()
                 .username(user.getUsername())
+                .token(jwtService.generateToken(user))
                 .roles(user.getRoles())
                 .message("Login success")
                 .build();
