@@ -4,21 +4,24 @@ import kna.springsecurity.dto.UserDTO.LoginRequest;
 import kna.springsecurity.dto.UserDTO.LoginResponse;
 import kna.springsecurity.dto.UserDTO.RegisterRequest;
 import kna.springsecurity.dto.UserDTO.RegisterResponse;
+import kna.springsecurity.dto.UserDTO.RefreshTokenRequest;
+import kna.springsecurity.dto.UserDTO.RefreshTokenResponse;
 import kna.springsecurity.entity.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import kna.springsecurity.repository.UserRepository;
 import kna.springsecurity.service.AuthService;
 import kna.springsecurity.security.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import kna.springsecurity.security.CustomUserDetails;
 
-import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-        private final JwtService jwtService;
+    private final JwtService jwtService;
 
     public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
@@ -37,7 +40,8 @@ public class AuthServiceImpl implements AuthService {
 
         return LoginResponse.builder()
                 .username(user.getUsername())
-                .token(jwtService.generateToken(user))
+                .accessToken(jwtService.generateAccessToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
                 .roles(user.getRoles())
                 .message("Login success")
                 .build();
@@ -63,6 +67,27 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .roles("USER")
                 .message("Register success")
+                .build();
+    }
+
+    @Override
+    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+        
+        if (request.getRefreshToken() == null || request.getRefreshToken().isEmpty()) {
+            throw new RuntimeException("Refresh token is required");
+        }
+
+        String username = jwtService.extractUsername(request.getRefreshToken());
+        User user = userRepository.findByUsername(username)
+                                               .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(!jwtService.validateToken(request.getRefreshToken(), new CustomUserDetails(user))) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        return RefreshTokenResponse.builder()
+                .accessToken(jwtService.generateAccessToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
                 .build();
     }
 }

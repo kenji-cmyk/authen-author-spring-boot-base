@@ -22,7 +22,8 @@ public class UserDTO {
     @AllArgsConstructor
     public static class LoginResponse {
         private String username;
-        private String token;
+        private String accessToken;
+        private String refreshToken;
         private String roles;
         private String message;
     }
@@ -45,5 +46,22 @@ public class UserDTO {
         private String username;
         private String roles;
         private String message;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RefreshTokenRequest {
+        private String refreshToken;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RefreshTokenResponse {
+        private String accessToken;
+        private String refreshToken;
     }
 }
