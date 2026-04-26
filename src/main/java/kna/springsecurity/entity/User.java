@@ -21,9 +21,15 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(nullable = false)
-    private String roles;           
+    private String roles;
+
+    @Column(nullable = false)
+    private String provider;
+
+    @Column(nullable = false)
+    private String providerId;
 }
