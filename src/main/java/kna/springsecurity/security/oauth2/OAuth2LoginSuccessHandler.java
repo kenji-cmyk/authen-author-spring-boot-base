@@ -12,6 +12,12 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import kna.springsecurity.repository.RoleRepository;
+import kna.springsecurity.repository.ProviderRepository;
+import kna.springsecurity.entity.Role;
+import kna.springsecurity.entity.Provider;
+import java.util.Set;
+import java.util.Collections;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,6 +27,8 @@ import java.util.Map;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final ProviderRepository providerRepository;
     private final JwtService jwtService;
 
     @Override
@@ -38,10 +46,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         User user = userRepository.findByUsername(username)
                 .orElseGet(() -> {
                     System.out.println("Đăng ký User mới từ " + provider + ": " + username);
+                    
+                    Role userRole = roleRepository.findByName("ROLE_USER")
+                            .orElseThrow(() -> new RuntimeException("Default role not found"));
+                    Provider oauthProvider = providerRepository.findByName(provider.toUpperCase())
+                            .orElseThrow(() -> new RuntimeException("Provider " + provider + " not found"));
+
                     User newUser = User.builder()
                             .username(username)
-                            .roles("USER")
-                            .provider(provider)
+                            .roles(Set.of(userRole))
+                            .provider(oauthProvider)
                             .providerId(providerId)
                             .build();
                     return userRepository.save(newUser);

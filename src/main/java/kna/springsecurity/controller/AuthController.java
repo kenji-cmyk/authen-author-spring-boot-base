@@ -1,12 +1,13 @@
 package kna.springsecurity.controller;
 
-import kna.springsecurity.dto.UserDTO.LoginRequest;
-import kna.springsecurity.dto.UserDTO.LoginResponse;
-import kna.springsecurity.dto.UserDTO.RegisterRequest;
-import kna.springsecurity.dto.UserDTO.RegisterResponse;
-import kna.springsecurity.dto.UserDTO.RefreshTokenRequest;
-import kna.springsecurity.dto.UserDTO.RefreshTokenResponse;
+import kna.springsecurity.dto.AuthDTO.LoginRequest;
+import kna.springsecurity.dto.AuthDTO.LoginResponse;
+import kna.springsecurity.dto.AuthDTO.RegisterRequest;
+import kna.springsecurity.dto.AuthDTO.RegisterResponse;
+import kna.springsecurity.dto.AuthDTO.RefreshTokenRequest;
+import kna.springsecurity.dto.AuthDTO.RefreshTokenResponse;
 import kna.springsecurity.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
 
         LoginResponse response = authService.login(request);
         
@@ -29,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
 
         RegisterResponse response = authService.register(request); 
 

@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+import java.util.HashSet;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -24,13 +27,20 @@ public class User {
     @Column(nullable = true)
     private String password;
 
-    @Column(nullable = false)
-    private String roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 
-    @Column(nullable = false)
-    private String provider;
+    @ManyToOne
+    @JoinColumn(name = "provider_id_fk")
+    private Provider provider;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String providerId;
 
     @Column

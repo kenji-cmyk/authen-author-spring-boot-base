@@ -31,14 +31,24 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/home", "/h2-console/**", "/h2-console", "/api/auth/**", "/login").permitAll()
+                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/h2-console/**", "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authenticationProvider(authenticationProvider())
             .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
                 .successHandler(oauth2LoginSuccessHandler)
             );
 

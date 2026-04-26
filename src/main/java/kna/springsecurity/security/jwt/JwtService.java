@@ -33,7 +33,10 @@ public class JwtService {
 
     public String generateAccessToken(User user) {
        Map<String, Object> claims = new HashMap<>();
-       claims.put("roles", user.getRoles());
+       List<String> roles = user.getRoles().stream()
+                               .map(role -> role.getName())
+                               .toList();
+       claims.put("roles", roles);
        return createToken(claims, user.getUsername());
     }
 
