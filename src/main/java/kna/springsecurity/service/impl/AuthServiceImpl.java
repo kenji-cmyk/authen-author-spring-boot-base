@@ -56,6 +56,8 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(jwtService.generateRefreshToken(user))
                 .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.joining(",")))
+                .provider(user.getProvider().getName())
+                .email(user.getEmail() == null ? "" : user.getEmail())
                 .message("Login success")
                 .build();
     }
@@ -86,6 +88,8 @@ public class AuthServiceImpl implements AuthService {
         return RegisterResponse.builder()
                 .username(user.getUsername())
                 .roles("ROLE_USER")
+                .provider(user.getProvider().getName())
+                .email(user.getEmail() == null ? "" : user.getEmail())
                 .message("Register success")
                 .build();
     }

@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 public class AuthDTO {
 
-
     @Data
     @Builder
     @NoArgsConstructor
@@ -35,6 +34,8 @@ public class AuthDTO {
         private String accessToken;
         private String refreshToken;
         private String roles;
+        private String provider;
+        private String email;
         private String message;
     }
 
@@ -63,6 +64,8 @@ public class AuthDTO {
     public static class RegisterResponse {
         private String username;
         private String roles;
+        private String provider;
+        private String email;
         private String message;
     }
 
