@@ -16,18 +16,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/home", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/login").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin((form) -> form
-                .loginPage("/login")
-                .permitAll()
-            )
-            .logout((logout) -> logout
-                .logoutUrl("/logout")
-                .permitAll()
-            )
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+            .formLogin((form) -> form.disable())
+            .logout((logout) -> logout.disable()    )
+            .csrf(csrf -> csrf.disable())
             .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();

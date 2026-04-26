@@ -21,7 +21,11 @@ public class SpringSecurityApplication {
     CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.findByUsername("user").isEmpty()) {
-                userRepository.save(new User("user", passwordEncoder.encode("password"), List.of("USER")));
+                userRepository.save(User.builder()
+                        .username("user")
+                        .password(passwordEncoder.encode("password"))
+                        .roles("USER")
+                        .build());
             }
         };
     }
