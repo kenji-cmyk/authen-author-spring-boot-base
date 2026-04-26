@@ -1,8 +1,7 @@
 package kna.springsecurity.infrastructure.security;
 
-import kna.springsecurity.application.port.in.FindUserCredentialUseCase;
-import kna.springsecurity.domain.model.UserCredential;
-import org.springframework.security.core.userdetails.User;
+import kna.springsecurity.application.port.in.FindUserUseCase;
+import kna.springsecurity.domain.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,20 +10,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class SpringSecurityUserDetailsService implements UserDetailsService {
 
-    private final FindUserCredentialUseCase findUserCredentialUseCase;
+    private final FindUserUseCase findUserUseCase;
 
-    public SpringSecurityUserDetailsService(FindUserCredentialUseCase findUserCredentialUseCase) {
-        this.findUserCredentialUseCase = findUserCredentialUseCase;
+    public SpringSecurityUserDetailsService(FindUserUseCase findUserUseCase) {
+        this.findUserUseCase = findUserUseCase;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserCredential userCredential = findUserCredentialUseCase.findByUsername(username)
+        User user = findUserUseCase.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        return User.withUsername(userCredential.username())
-                .password(userCredential.encodedPassword())
-                .roles(userCredential.roles().toArray(new String[0]))
-                .build();
+        return new CustomUserDetails(user);
     }
 }
