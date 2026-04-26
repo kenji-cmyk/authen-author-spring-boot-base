@@ -1,49 +1,32 @@
-package kna.springsecurity;
-
+package kna.springsecurity.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.beans.Encoder;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig {
+public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain (HttpSecurity http) {
-
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/","/home").permitAll().anyRequest().authenticated())
+                        .requestMatchers("/", "/home").permitAll()
+                        .anyRequest().authenticated())
                 .formLogin((form) -> form.loginPage("/login").permitAll())
                 .logout(LogoutConfigurer::permitAll);
 
         return http.build();
     }
 
-
     @Bean
-    PasswordEncoder passwordEncoder () {
-
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    UserDetailsService userDetailsService (PasswordEncoder encoder){
-        String password = encoder.encode("password");
-        String username = "user";
-        UserDetails user = User.withUsername(username).password(password).roles("USER").build();
-        return new InMemoryUserDetailsManager(user);
     }
 }
