@@ -39,6 +39,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         Map<String, Object> attributes = oauthUser.getAttributes();
         String email = (String) attributes.get("email");
         String providerId = oauthUser.getName(); 
+        String username = email.split("@")[0];
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
@@ -49,7 +50,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
                     User newUser = User.builder()
                             .email(email)
-                            .username(email)
+                            .username(username)
                             .roles(Set.of(userRole))
                             .provider(oauthProvider)
                             .providerId(providerId)
