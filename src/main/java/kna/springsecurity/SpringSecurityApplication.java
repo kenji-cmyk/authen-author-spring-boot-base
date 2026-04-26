@@ -27,6 +27,13 @@ public class SpringSecurityApplication {
                         .roles("USER")
                         .build());
             }
+            if (userRepository.findByUsername("admin").isEmpty()) {
+                userRepository.save(User.builder()
+                        .username("admin")
+                        .password(passwordEncoder.encode("admin123"))
+                        .roles("ADMIN")
+                        .build());
+            }
         };
     }
 }
