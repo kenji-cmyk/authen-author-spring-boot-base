@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
 
 @SpringBootApplication
 public class SpringSecurityApplication {
@@ -25,6 +24,8 @@ public class SpringSecurityApplication {
                         .username("user")
                         .password(passwordEncoder.encode("password"))
                         .roles("USER")
+                        .provider("LOCAL")
+                        .providerId("LOCAL")
                         .build());
             }
             if (userRepository.findByUsername("admin").isEmpty()) {
@@ -32,8 +33,16 @@ public class SpringSecurityApplication {
                         .username("admin")
                         .password(passwordEncoder.encode("admin123"))
                         .roles("ADMIN")
+                        .provider("LOCAL")
+                        .providerId("LOCAL")
                         .build());
             }
+            
+            System.out.println("----- DANH SACH USER TRONG DB -----");
+            userRepository.findAll().forEach(u -> 
+                System.out.println("User: " + u.getUsername() + " | Role: " + u.getRoles() + " | Provider: " + u.getProvider())
+            );
+            System.out.println("-----------------------------------");
         };
     }
 }
