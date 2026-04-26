@@ -15,6 +15,7 @@ public class UserDTO {
     public static class UserResponse {
         private Long id;
         private String username;
+        private String email;
         private String roles;
         private String provider;
     }

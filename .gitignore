@@ -38,4 +38,13 @@ build/
 ## Markdown ###
 *.md    
 
+## Env ###
 application.properties
+
+## Docs ###
+docs/
+
+## Other ###
+mastercard
+/data
+

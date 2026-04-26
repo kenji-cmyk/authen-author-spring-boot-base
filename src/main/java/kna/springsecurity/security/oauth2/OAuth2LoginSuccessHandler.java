@@ -40,20 +40,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String email = (String) attributes.get("email");
         String providerId = oauthUser.getName(); 
 
-        String loginName = (String) attributes.get("login");
-        String username = (email != null) ? email : (loginName != null ? loginName : providerId);
-
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    System.out.println("Đăng ký User mới từ " + provider + ": " + username);
-                    
                     Role userRole = roleRepository.findByName("ROLE_USER")
                             .orElseThrow(() -> new RuntimeException("Default role not found"));
                     Provider oauthProvider = providerRepository.findByName(provider.toUpperCase())
                             .orElseThrow(() -> new RuntimeException("Provider " + provider + " not found"));
 
                     User newUser = User.builder()
-                            .username(username)
+                            .email(email)
+                            .username(email)
                             .roles(Set.of(userRole))
                             .provider(oauthProvider)
                             .providerId(providerId)

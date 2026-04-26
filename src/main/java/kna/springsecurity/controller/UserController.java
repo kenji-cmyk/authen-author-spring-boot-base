@@ -1,7 +1,7 @@
 package kna.springsecurity.controller;
 
 import kna.springsecurity.pkg.PageResponse;
-import kna.springsecurity.dto.UserDTO;
+import kna.springsecurity.dto.UserDTO.UserResponse;
 import kna.springsecurity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<PageResponse<UserDTO.UserResponse>> getAllUsers(
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit) {
         return ResponseEntity.ok(userService.getAllUsers(page, limit));
@@ -26,12 +26,12 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<UserDTO.UserResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO.UserResponse> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
         return ResponseEntity.ok(userService.getUserByUsername(authentication.getName()));
     }
 }
