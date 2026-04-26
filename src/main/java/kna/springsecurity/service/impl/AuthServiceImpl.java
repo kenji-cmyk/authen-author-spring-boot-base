@@ -1,30 +1,43 @@
 package kna.springsecurity.service.impl;
 
-import kna.springsecurity.dto.UserDTO.LoginRequest;
-import kna.springsecurity.dto.UserDTO.LoginResponse;
-import kna.springsecurity.dto.UserDTO.RegisterRequest;
-import kna.springsecurity.dto.UserDTO.RegisterResponse;
-import kna.springsecurity.dto.UserDTO.RefreshTokenRequest;
-import kna.springsecurity.dto.UserDTO.RefreshTokenResponse;
+import kna.springsecurity.dto.AuthDTO.LoginRequest;
+import kna.springsecurity.dto.AuthDTO.LoginResponse;
+import kna.springsecurity.dto.AuthDTO.RegisterRequest;
+import kna.springsecurity.dto.AuthDTO.RegisterResponse;
+import kna.springsecurity.dto.AuthDTO.RefreshTokenRequest;
+import kna.springsecurity.dto.AuthDTO.RefreshTokenResponse;
 import kna.springsecurity.entity.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import kna.springsecurity.repository.UserRepository;
 import kna.springsecurity.service.AuthService;
 import kna.springsecurity.security.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import kna.springsecurity.security.CustomUserDetails;
+import kna.springsecurity.repository.RoleRepository;
+import kna.springsecurity.repository.ProviderRepository;
+import kna.springsecurity.entity.Role;
+import kna.springsecurity.entity.Provider;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final ProviderRepository providerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthServiceImpl(UserRepository userRepository, 
+                           RoleRepository roleRepository,
+                           ProviderRepository providerRepository,
+                           PasswordEncoder passwordEncoder, 
+                           JwtService jwtService) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.providerRepository = providerRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -42,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(jwtService.generateRefreshToken(user))
-                .roles(user.getRoles())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.joining(",")))
                 .message("Login success")
                 .build();
     }
@@ -55,11 +68,16 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Username already exists");
         }
 
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Default role not found"));
+        Provider localProvider = providerRepository.findByName("LOCAL")
+                .orElseThrow(() -> new RuntimeException("Default provider not found"));
+
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles("USER") 
-                .provider("LOCAL")
+                .roles(Set.of(userRole)) 
+                .provider(localProvider)
                 .providerId("LOCAL")
                 .build();
 
@@ -67,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
 
         return RegisterResponse.builder()
                 .username(user.getUsername())
-                .roles("USER")
+                .roles("ROLE_USER")
                 .message("Register success")
                 .build();
     }
