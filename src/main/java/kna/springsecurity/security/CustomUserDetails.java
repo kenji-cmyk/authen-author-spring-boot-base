@@ -1,6 +1,6 @@
-package kna.springsecurity.infrastructure.security;
+package kna.springsecurity.security;
 
-import kna.springsecurity.domain.model.User;
+import kna.springsecurity.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,19 +18,19 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.roles().stream()
+        return user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
     }
 
     @Override
     public String getPassword() {
-        return user.encodedPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.username();
+        return user.getUsername();
     }
 
     @Override

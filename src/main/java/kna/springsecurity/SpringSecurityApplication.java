@@ -1,7 +1,7 @@
 package kna.springsecurity;
 
-import kna.springsecurity.infrastructure.security.JpaUserRepository;
-import kna.springsecurity.infrastructure.security.UserEntity;
+import kna.springsecurity.entity.User;
+import kna.springsecurity.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,10 +18,10 @@ public class SpringSecurityApplication {
     }
 
     @Bean
-    CommandLineRunner initDatabase(JpaUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.findByUsername("user").isEmpty()) {
-                userRepository.save(new UserEntity("user", passwordEncoder.encode("password"), List.of("USER")));
+                userRepository.save(new User("user", passwordEncoder.encode("password"), List.of("USER")));
             }
         };
     }

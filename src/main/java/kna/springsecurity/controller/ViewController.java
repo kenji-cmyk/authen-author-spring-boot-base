@@ -1,4 +1,4 @@
-package kna.springsecurity.presentation.web;
+package kna.springsecurity.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

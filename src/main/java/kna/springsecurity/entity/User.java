@@ -1,11 +1,11 @@
-package kna.springsecurity.infrastructure.security;
+package kna.springsecurity.entity;
 
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class UserEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,9 @@ public class UserEntity {
     @Column(name = "role")
     private List<String> roles;
 
-    protected UserEntity() {}
+    protected User() {}
 
-    public UserEntity(String username, String password, List<String> roles) {
+    public User(String username, String password, List<String> roles) {
         this.username = username;
         this.password = password;
         this.roles = roles;
