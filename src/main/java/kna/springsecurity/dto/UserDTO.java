@@ -22,6 +22,7 @@ public class UserDTO {
     @AllArgsConstructor
     public static class LoginResponse {
         private String username;
+        private String token;
         private String roles;
         private String message;
     }
