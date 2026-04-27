@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 public class UserDTO {
 
 
@@ -16,7 +18,7 @@ public class UserDTO {
         private Long id;
         private String username;
         private String email;
-        private String roles;
+        private Set<String> roles;
         private String provider;
     }
 }

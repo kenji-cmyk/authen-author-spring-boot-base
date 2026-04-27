@@ -17,7 +17,7 @@ import kna.springsecurity.repository.ProviderRepository;
 import kna.springsecurity.entity.Role;
 import kna.springsecurity.entity.Provider;
 import java.util.Set;
-import java.util.Collections;
+import java.util.Locale;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,14 +38,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String provider = oauthToken.getAuthorizedClientRegistrationId();
         Map<String, Object> attributes = oauthUser.getAttributes();
         String email = (String) attributes.get("email");
-        String providerId = oauthUser.getName(); 
         String username = email.split("@")[0];
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     Role userRole = roleRepository.findByName("ROLE_USER")
                             .orElseThrow(() -> new RuntimeException("Default role not found"));
-                    Provider oauthProvider = providerRepository.findByName(provider.toUpperCase())
+                    Provider oauthProvider = providerRepository.findByName(provider.toUpperCase(Locale.ROOT))
                             .orElseThrow(() -> new RuntimeException("Provider " + provider + " not found"));
 
                     User newUser = User.builder()
@@ -53,7 +52,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                             .username(username)
                             .roles(Set.of(userRole))
                             .provider(oauthProvider)
-                            .providerId(providerId)
                             .build();
                     return userRepository.save(newUser);
                 });

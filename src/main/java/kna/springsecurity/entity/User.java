@@ -43,9 +43,6 @@ public class User {
     @JoinColumn(name = "provider_id_fk")
     private Provider provider;
 
-    @Column(nullable = true)
-    private String providerId;
-
     @Column
     private String refreshToken;
 

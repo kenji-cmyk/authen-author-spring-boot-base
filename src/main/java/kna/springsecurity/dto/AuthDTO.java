@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import kna.springsecurity.dto.UserDTO.UserResponse;
 
 public class AuthDTO {
 
@@ -30,13 +31,10 @@ public class AuthDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginResponse {
-        private String username;
         private String accessToken;
         private String refreshToken;
-        private String roles;
-        private String provider;
-        private String email;
         private String message;
+        UserResponse userInfo;
     }
 
     @Data
@@ -62,10 +60,7 @@ public class AuthDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterResponse {
-        private String username;
-        private String roles;
-        private String provider;
-        private String email;
+        UserResponse userInfo;
         private String message;
     }
 

@@ -47,16 +47,18 @@ public class DataInitializer implements CommandLineRunner {
 
         // Initialize Users
         if (userRepository.count() == 0) {
-            Role userRole = roleRepository.findByName("ROLE_USER").orElse(null);
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElse(null);
-            Provider localProvider = providerRepository.findByName("LOCAL").orElse(null);
+            Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("ROLE_USER not found"));
+            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+                .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
+            Provider localProvider = providerRepository.findByName("LOCAL")
+                .orElseThrow(() -> new RuntimeException("LOCAL provider not found"));
 
             userRepository.save(User.builder()
                     .username("user")
                     .password(passwordEncoder.encode("User123@"))
                     .roles(Set.of(userRole))
                     .provider(localProvider)
-                    .providerId("LOCAL")
                     .build());
 
             userRepository.save(User.builder()
@@ -64,7 +66,6 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("Admin123@"))
                     .roles(Set.of(adminRole))
                     .provider(localProvider)
-                    .providerId("LOCAL")
                     .build());
             
             System.out.println("Initialized default users: user, admin");
