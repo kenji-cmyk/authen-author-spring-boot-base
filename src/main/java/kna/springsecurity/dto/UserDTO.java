@@ -21,5 +21,7 @@ public class UserDTO {
         private String email;
         private Set<String> roles;
         private ProviderResponse provider;
+        private Boolean mfaEnabled;
+        private Boolean mfaVerified;
     }
 }

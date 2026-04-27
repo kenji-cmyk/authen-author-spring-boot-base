@@ -33,6 +33,8 @@ public class UserMapper {
                                 .collect(Collectors.toSet())
                 )
                 .provider(providerInfo)
+                .mfaEnabled(user.isMfaEnabled())
+                .mfaVerified(Boolean.TRUE.equals(user.getMfaVerified()))
                 .build();
     }
 }

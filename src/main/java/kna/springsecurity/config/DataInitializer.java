@@ -46,6 +46,8 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("User123@"))
                     .roles(Set.of(RoleName.USER))
                     .provider(localProvider)
+                    .mfaEnabled(false)
+                    .mfaVerified(true)
                     .build());
 
             userRepository.save(User.builder()
@@ -53,6 +55,8 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("Admin123@"))
                     .roles(Set.of(RoleName.ADMIN))
                     .provider(localProvider)
+                    .mfaEnabled(false)
+                    .mfaVerified(true)
                     .build());
             
             System.out.println("Initialized default users: user, admin");

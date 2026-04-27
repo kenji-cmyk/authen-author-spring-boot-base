@@ -45,5 +45,14 @@ public class User {
     @Column
     private String refreshToken;
 
+    @Column
+    private boolean mfaEnabled;
+
+    @Column
+    private Boolean mfaVerified;
+
+    @Column
+    private String secretKey;
+
     
 }

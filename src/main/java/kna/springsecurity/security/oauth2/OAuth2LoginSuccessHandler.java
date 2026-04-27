@@ -54,6 +54,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                             .username(username)
                             .roles(Set.of(RoleName.USER))
                             .provider(oauthProvider)
+                            .mfaEnabled(false)
+                            .mfaVerified(true)
                             .build();
                     return userRepository.save(newUser);
                 });
