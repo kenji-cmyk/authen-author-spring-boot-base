@@ -133,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
         String tempToken = null;
         if(mfaEnabled){
             user.setSecretKey(twoFactorAuthenService.generateNewSecret());
-            qrUri = twoFactorAuthenService.generateQRCodeImgUri(user.getSecretKey());
+            qrUri = twoFactorAuthenService.generateQRCodeImgUri(user);
         }
 
         userRepository.save(user);
@@ -250,7 +250,7 @@ public class AuthServiceImpl implements AuthService {
         user.setMfaVerified(false);
         userRepository.save(user);
 
-        String qrUri = twoFactorAuthenService.generateQRCodeImgUri(user.getSecretKey());
+        String qrUri = twoFactorAuthenService.generateQRCodeImgUri(user);
 
         return Enable2FAResponse.builder()
                 .secretImageUri(qrUri)

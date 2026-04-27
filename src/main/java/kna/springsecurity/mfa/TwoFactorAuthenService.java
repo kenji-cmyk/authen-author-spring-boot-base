@@ -9,6 +9,7 @@ import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
 import dev.samstevens.totp.util.Utils;
+import kna.springsecurity.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +17,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class TwoFactorAuthenService {
 
+
+    private final String ISSUER = "Authen-Author-Base"; 
+
     public String generateNewSecret (){
         return new DefaultSecretGenerator().generate();
     }
 
-    public String generateQRCodeImgUri(String secret) {
+    public String generateQRCodeImgUri(User user) {
 
         QrData data = new QrData.Builder()
-                        .label("Authen-Author-Base")
-                        .secret(secret)
-                        .issuer("Authen-Author")
+                        .label(ISSUER + ":" + user.getUsername())
+                        .secret(user.getSecretKey())
+                        .issuer(ISSUER)
                         .algorithm(HashingAlgorithm.SHA1)
                         .digits(6)
                         .period(30)
