@@ -7,9 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import kna.springsecurity.dto.UserDTO.UserResponse;
+import kna.springsecurity.enums.RoleName;
+
+import java.util.Set;
 
 public class AuthDTO {
-
 
     @Data
     @Builder
@@ -31,11 +34,10 @@ public class AuthDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginResponse {
-        private String username;
         private String accessToken;
         private String refreshToken;
-        private String roles;
         private String message;
+        UserResponse userInfo;
     }
 
     @Data
@@ -53,7 +55,7 @@ public class AuthDTO {
         @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%^&+=!]).*$",
                 message = "Password must contain at least one uppercase letter, one number and one special character (@#$%^&+=!)")
         private String password;
-        private String roles;
+        private Set<RoleName> roles;
     }
 
     @Data
@@ -61,8 +63,7 @@ public class AuthDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RegisterResponse {
-        private String username;
-        private String roles;
+        UserResponse userInfo;
         private String message;
     }
 

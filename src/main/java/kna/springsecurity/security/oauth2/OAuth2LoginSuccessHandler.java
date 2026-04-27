@@ -4,6 +4,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kna.springsecurity.entity.User;
+import kna.springsecurity.enums.RoleName;
+import kna.springsecurity.exception.custom.BadRequestException;
 import kna.springsecurity.repository.UserRepository;
 import kna.springsecurity.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +14,10 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import kna.springsecurity.repository.RoleRepository;
 import kna.springsecurity.repository.ProviderRepository;
-import kna.springsecurity.entity.Role;
 import kna.springsecurity.entity.Provider;
+import org.springframework.util.StringUtils;
 import java.util.Set;
-import java.util.Collections;
 
 import java.io.IOException;
 import java.util.Map;
@@ -27,7 +27,6 @@ import java.util.Map;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final ProviderRepository providerRepository;
     private final JwtService jwtService;
 
@@ -38,25 +37,23 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String provider = oauthToken.getAuthorizedClientRegistrationId();
         Map<String, Object> attributes = oauthUser.getAttributes();
         String email = (String) attributes.get("email");
-        String providerId = oauthUser.getName(); 
 
-        String loginName = (String) attributes.get("login");
-        String username = (email != null) ? email : (loginName != null ? loginName : providerId);
+        if (!StringUtils.hasText(email)) {
+            throw new BadRequestException("OAuth2 provider did not return a valid email");
+        }
 
-        User user = userRepository.findByUsername(username)
+        String username = email.split("@")[0];
+
+        User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    System.out.println("Đăng ký User mới từ " + provider + ": " + username);
-                    
-                    Role userRole = roleRepository.findByName("ROLE_USER")
-                            .orElseThrow(() -> new RuntimeException("Default role not found"));
-                    Provider oauthProvider = providerRepository.findByName(provider.toUpperCase())
+                    Provider oauthProvider = providerRepository.findByNameIgnoreCase(provider)
                             .orElseThrow(() -> new RuntimeException("Provider " + provider + " not found"));
 
                     User newUser = User.builder()
+                            .email(email)
                             .username(username)
-                            .roles(Set.of(userRole))
+                            .roles(Set.of(RoleName.USER))
                             .provider(oauthProvider)
-                            .providerId(providerId)
                             .build();
                     return userRepository.save(newUser);
                 });

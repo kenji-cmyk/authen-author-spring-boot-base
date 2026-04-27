@@ -34,7 +34,7 @@ public class JwtService {
     public String generateAccessToken(User user) {
        Map<String, Object> claims = new HashMap<>();
        List<String> roles = user.getRoles().stream()
-                               .map(role -> role.getName())
+                                         .map(role -> role.toDatabaseRoleName())
                                .toList();
        claims.put("roles", roles);
        return createToken(claims, user.getUsername());

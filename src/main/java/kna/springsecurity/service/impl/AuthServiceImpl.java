@@ -7,55 +7,60 @@ import kna.springsecurity.dto.AuthDTO.RegisterResponse;
 import kna.springsecurity.dto.AuthDTO.RefreshTokenRequest;
 import kna.springsecurity.dto.AuthDTO.RefreshTokenResponse;
 import kna.springsecurity.entity.User;
+import kna.springsecurity.enums.RoleName;
 import kna.springsecurity.repository.UserRepository;
 import kna.springsecurity.service.AuthService;
 import kna.springsecurity.security.jwt.JwtService;
+import kna.springsecurity.security.CustomUserDetails;
+import kna.springsecurity.repository.ProviderRepository;
+import kna.springsecurity.entity.Provider;
+import kna.springsecurity.dto.UserDTO.UserResponse;
+import kna.springsecurity.exception.custom.BadRequestException;
+import kna.springsecurity.exception.custom.ConflictException;
+import kna.springsecurity.exception.custom.UnauthorizedException;
+import kna.springsecurity.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import kna.springsecurity.security.CustomUserDetails;
-import kna.springsecurity.repository.RoleRepository;
-import kna.springsecurity.repository.ProviderRepository;
-import kna.springsecurity.entity.Role;
-import kna.springsecurity.entity.Provider;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final ProviderRepository providerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
     public AuthServiceImpl(UserRepository userRepository, 
-                           RoleRepository roleRepository,
                            ProviderRepository providerRepository,
                            PasswordEncoder passwordEncoder, 
-                           JwtService jwtService) {
+                           JwtService jwtService,
+                           UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.providerRepository = providerRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.userMapper = userMapper;
     }
 
     @Override
     public LoginResponse login(LoginRequest request) {
         
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
         
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new RuntimeException("Invalid password"); 
+            throw new UnauthorizedException("Invalid username or password");
         }
 
+        UserResponse userInfo = userMapper.mapToUserResponse(user);
+
         return LoginResponse.builder()
-                .username(user.getUsername())
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(jwtService.generateRefreshToken(user))
-                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.joining(",")))
+                .userInfo(userInfo)
                 .message("Login success")
                 .build();
     }
@@ -65,27 +70,28 @@ public class AuthServiceImpl implements AuthService {
 
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new ConflictException("Username already exists");
         }
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
-        Provider localProvider = providerRepository.findByName("LOCAL")
-                .orElseThrow(() -> new RuntimeException("Default provider not found"));
+        Provider localProvider = providerRepository.findByNameIgnoreCase("LOCAL")
+                .orElseThrow(() -> new IllegalStateException("Default provider not found"));
+    Set<RoleName> roles = request.getRoles() == null || request.getRoles().isEmpty()
+        ? Set.of(RoleName.USER)
+        : request.getRoles();
 
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Set.of(userRole)) 
+                .roles(roles)
                 .provider(localProvider)
-                .providerId("LOCAL")
                 .build();
 
         userRepository.save(user);
 
+        UserResponse userInfo = userMapper.mapToUserResponse(user);
+
         return RegisterResponse.builder()
-                .username(user.getUsername())
-                .roles("ROLE_USER")
+                .userInfo(userInfo)
                 .message("Register success")
                 .build();
     }
@@ -94,15 +100,15 @@ public class AuthServiceImpl implements AuthService {
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
         
         if (request.getRefreshToken() == null || request.getRefreshToken().isEmpty()) {
-            throw new RuntimeException("Refresh token is required");
+            throw new BadRequestException("Refresh token is required");
         }
 
         String username = jwtService.extractUsername(request.getRefreshToken());
         User user = userRepository.findByUsername(username)
-                                               .orElseThrow(() -> new RuntimeException("User not found"));
+                                               .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
 
         if(!jwtService.validateToken(request.getRefreshToken(), new CustomUserDetails(user))) {
-            throw new RuntimeException("Invalid refresh token");
+            throw new UnauthorizedException("Invalid refresh token");
         }
 
         return RefreshTokenResponse.builder()
@@ -110,4 +116,5 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(jwtService.generateRefreshToken(user))
                 .build();
     }
+
 }
