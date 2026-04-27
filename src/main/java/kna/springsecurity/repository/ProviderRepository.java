@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface ProviderRepository extends JpaRepository<Provider, Long> {
     Optional<Provider> findByName(String name);
+    Optional<Provider> findByNameIgnoreCase(String name);
 }

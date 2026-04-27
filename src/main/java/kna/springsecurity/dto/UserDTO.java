@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import kna.springsecurity.dto.ProviderDTO.ProviderResponse;
 
 import java.util.Set;
 
@@ -19,6 +20,6 @@ public class UserDTO {
         private String username;
         private String email;
         private Set<String> roles;
-        private String provider;
+        private ProviderResponse provider;
     }
 }
