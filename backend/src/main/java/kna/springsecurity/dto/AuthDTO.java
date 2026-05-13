@@ -40,6 +40,7 @@ public class AuthDTO {
         private String refreshToken;
         private String message;
         private String tempToken;
+        private String secretImageUri;
         private UserResponse userInfo;
     }
 

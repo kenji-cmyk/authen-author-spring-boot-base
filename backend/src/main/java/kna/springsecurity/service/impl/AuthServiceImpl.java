@@ -87,6 +87,7 @@ public class AuthServiceImpl implements AuthService {
             String message = mfaVerified
                 ? "Login success, please verify 2FA"
                 : "Please verify 2FA setup to complete account activation";
+            String secretImageUri = mfaVerified ? null : twoFactorAuthenService.generateQRCodeImgUri(user);
 
             return LoginResponse.builder()
                     .accessToken("")
@@ -94,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
                     .userInfo(userInfo)
                     .tempToken(tempTokenService.generateAndStore(user.getId(), tempTokenPurpose))
                     .message(message)
+                    .secretImageUri(secretImageUri)
                     .build();
         }
 
@@ -215,6 +217,7 @@ public class AuthServiceImpl implements AuthService {
                 .message(message)
                 .refreshToken(jwtService.generateRefreshToken(user))
                 .accessToken(jwtService.generateAccessToken(user))
+                .tempToken(tempTokenService.generateAndStore(user.getId(), TempTokenPurpose.REGISTER_2FA_SETUP))
                 .userInfo(userInfo)
                 .build();
     }
