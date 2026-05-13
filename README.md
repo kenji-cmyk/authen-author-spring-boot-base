@@ -70,7 +70,7 @@ npm run build
 - ✅ Two-Factor Authentication (2FA/MFA)
 - ✅ Role-based access control (USER, ADMIN)
 - ✅ Password validation
-- ✅ H2 in-memory database
+- ✅ H2 file database (persistent)
 
 ### Frontend
 - ✅ Animated login page với cartoon characters
@@ -142,6 +142,29 @@ npm run dev
 ```
 
 3. Truy cập: `http://localhost:3000`
+
+## Docker Compose (recommended)
+
+Chạy toàn hệ thống bằng Docker với dữ liệu bền vững:
+
+```bash
+docker compose up -d --build
+```
+
+Services:
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080`
+- Redis: `localhost:6379`
+
+Volume bền vững:
+- `backend_data`: lưu H2 database file của backend
+- `redis_data`: lưu Redis data
+
+Dừng hệ thống:
+
+```bash
+docker compose down
+```
 
 ## Demo Credentials
 

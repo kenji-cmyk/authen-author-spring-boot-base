@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Locale;
 import java.util.Set;
 
 @Service
@@ -115,8 +116,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ConflictException("Username already exists");
         }
 
-        Provider localProvider = providerRepository.findByNameIgnoreCase("LOCAL")
-                .orElseThrow(() -> new IllegalStateException("Default provider not found"));
+        Provider localProvider = resolveOrCreateProvider("LOCAL");
         Set<RoleName> roles = request.getRoles() == null || request.getRoles().isEmpty()
         ? Set.of(RoleName.USER) : request.getRoles();
 
@@ -154,6 +154,15 @@ public class AuthServiceImpl implements AuthService {
                 ? "Register success, please verify 2FA setup"
                 : "Register success")
                 .build();
+    }
+
+    private Provider resolveOrCreateProvider(String providerName) {
+        return providerRepository.findByNameIgnoreCase(providerName)
+                .orElseGet(() -> providerRepository.save(
+                        Provider.builder()
+                                .name(providerName.toUpperCase(Locale.ROOT))
+                                .build()
+                ));
     }
 
     @Override

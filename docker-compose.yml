@@ -1,0 +1,49 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: authen-author-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: authen-author-backend
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/authdb
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: ""
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: "4qhq8L6K2wE/2bM9gZ5rD8iT/K1fV7nQpX3lE2oB4mA="
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend_data:/app/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: authen-author-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8080
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  backend_data:
+  redis_data:

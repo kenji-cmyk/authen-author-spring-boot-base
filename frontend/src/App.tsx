@@ -49,6 +49,17 @@ function resolveProtectedPath(path: RoutePath): Exclude<RoutePath, "/"> {
   return path;
 }
 
+// Handle OAuth2 redirect synchronously before App mounts
+const params = new URLSearchParams(window.location.search);
+const token = params.get("token");
+if (token) {
+  import("@/lib/auth-storage").then(({ setAccessToken }) => {
+    setAccessToken(token);
+    // Reload to clear the token from the URL and apply the auth state cleanly
+    window.location.replace(window.location.pathname);
+  });
+}
+
 function useCurrentPath() {
   const [path, setPath] = useState<RoutePath>(normalizePath(window.location.pathname));
 

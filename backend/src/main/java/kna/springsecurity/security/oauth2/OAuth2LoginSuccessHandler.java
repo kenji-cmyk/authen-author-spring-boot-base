@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import java.util.Set;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 @Component
@@ -46,8 +47,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    Provider oauthProvider = providerRepository.findByNameIgnoreCase(provider)
-                            .orElseThrow(() -> new RuntimeException("Provider " + provider + " not found"));
+                    Provider oauthProvider = resolveOrCreateProvider(provider);
 
                     User newUser = User.builder()
                             .email(email)
@@ -62,7 +62,23 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
 
         String token = jwtService.generateAccessToken(user);
-        String targetUrl = "/home?token=" + token;
+        
+        // Get the frontend URL from environment variable or default to localhost:3000
+        String frontendUrl = System.getenv("FRONTEND_URL");
+        if (frontendUrl == null || frontendUrl.isEmpty()) {
+            frontendUrl = "http://localhost:3000";
+        }
+        
+        String targetUrl = frontendUrl + "/?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    private Provider resolveOrCreateProvider(String providerName) {
+        return providerRepository.findByNameIgnoreCase(providerName)
+                .orElseGet(() -> providerRepository.save(
+                        Provider.builder()
+                                .name(providerName.toUpperCase(Locale.ROOT))
+                                .build()
+                ));
     }
 }
