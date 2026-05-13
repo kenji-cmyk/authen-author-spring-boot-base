@@ -8,12 +8,13 @@ interface AuthLayoutProps {
   title: string;
   description: string;
   children: ReactNode;
+  maskCharacters?: boolean;
 }
 
-export function AuthLayout({ title, description, children }: AuthLayoutProps) {
+export function AuthLayout({ title, description, children, maskCharacters = false }: AuthLayoutProps) {
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
-      <AuthHeroPanel />
+      <AuthHeroPanel maskCharacters={maskCharacters} />
 
       <section className="flex items-center justify-center bg-background p-8">
         <div className="w-full max-w-[420px] space-y-8">

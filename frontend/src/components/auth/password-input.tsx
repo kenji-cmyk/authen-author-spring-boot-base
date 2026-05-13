@@ -9,9 +9,11 @@ interface PasswordInputProps {
   value: string;
   placeholder?: string;
   onChange: (value: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
-export function PasswordInput({ id, value, placeholder, onChange }: PasswordInputProps) {
+export function PasswordInput({ id, value, placeholder, onChange, onFocus, onBlur }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   return (
@@ -22,6 +24,8 @@ export function PasswordInput({ id, value, placeholder, onChange }: PasswordInpu
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
+        onFocus={onFocus}
+        onBlur={onBlur}
         className="h-12 border-border/60 bg-background pr-10 focus:border-primary"
         required
       />

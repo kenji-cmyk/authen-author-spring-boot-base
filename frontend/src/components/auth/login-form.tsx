@@ -18,9 +18,10 @@ import { PasswordInput } from "@/components/auth/password-input";
 interface LoginFormProps {
   onNeed2FA: () => void;
   onSuccess: () => void;
+  onPasswordTypingChange?: (isTyping: boolean) => void;
 }
 
-export function LoginForm({ onNeed2FA, onSuccess }: LoginFormProps) {
+export function LoginForm({ onNeed2FA, onSuccess, onPasswordTypingChange }: LoginFormProps) {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -82,7 +83,14 @@ export function LoginForm({ onNeed2FA, onSuccess }: LoginFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="login-password">Password</Label>
-        <PasswordInput id="login-password" value={password} placeholder="••••••••" onChange={setPassword} />
+        <PasswordInput
+          id="login-password"
+          value={password}
+          placeholder="••••••••"
+          onChange={setPassword}
+          onFocus={() => onPasswordTypingChange?.(true)}
+          onBlur={() => onPasswordTypingChange?.(false)}
+        />
       </div>
 
       {error ? <StatusMessage message={error} variant="error" /> : null}

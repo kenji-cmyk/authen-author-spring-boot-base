@@ -24,6 +24,10 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 262 83% 58%;
     --radius: 0.5rem;
+    --character-purple: 256 90% 60%;
+    --character-black: 0 0% 18%;
+    --character-orange: 20 100% 70%;
+    --character-yellow: 54 75% 62%;
   }
 
   .dark {
@@ -46,6 +50,10 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 262 83% 58%;
+    --character-purple: 256 90% 60%;
+    --character-black: 0 0% 18%;
+    --character-orange: 20 100% 70%;
+    --character-yellow: 54 75% 62%;
   }
 }
 

@@ -1,6 +1,12 @@
 import { ShieldCheck, Sparkles } from "lucide-react";
 
-export function AuthHeroPanel() {
+import { AnimatedCharactersScene } from "@/components/characters/animated-characters-scene";
+
+interface AuthHeroPanelProps {
+  maskCharacters?: boolean;
+}
+
+export function AuthHeroPanel({ maskCharacters = false }: AuthHeroPanelProps) {
   return (
     <aside className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 text-primary-foreground">
       <div className="relative z-10 flex items-center gap-3">
@@ -10,11 +16,14 @@ export function AuthHeroPanel() {
         <p className="text-lg font-semibold leading-tight">Authen Author</p>
       </div>
 
-      <div className="relative z-10 space-y-4">
+      <div className="relative z-10 space-y-6">
         <h1 className="text-3xl font-bold leading-tight">Secure access with modern authentication</h1>
         <p className="max-w-md text-base text-primary-foreground/80">
           Login, verify 2FA and manage API flows in one clear interface designed for fast testing.
         </p>
+        <div className="flex justify-center">
+          <AnimatedCharactersScene className="origin-center scale-75" maskMode={maskCharacters} />
+        </div>
       </div>
 
       <div className="relative z-10 flex items-center gap-3 rounded-xl border border-primary-foreground/20 bg-primary-foreground/10 p-4">

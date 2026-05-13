@@ -15,16 +15,24 @@ type AuthTab = "login" | "register";
 
 export function LoginPage({ onGoVerify2FA, onGoDashboard }: LoginPageProps) {
   const [activeTab, setActiveTab] = useState<AuthTab>("login");
+  const [isPasswordTyping, setIsPasswordTyping] = useState<boolean>(false);
 
   return (
-    <AuthLayout title="Welcome back" description="Choose a flow to continue authentication">
+    <AuthLayout
+      title="Welcome back"
+      description="Choose a flow to continue authentication"
+      maskCharacters={activeTab === "login" && isPasswordTyping}
+    >
       <div className="space-y-5 rounded-xl border border-border bg-card p-6">
         <div className="grid grid-cols-2 rounded-lg bg-muted p-1">
           <Button
             type="button"
             variant="ghost"
             className={cn("h-10", activeTab === "login" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground")}
-            onClick={() => setActiveTab("login")}
+            onClick={() => {
+              setActiveTab("login");
+              setIsPasswordTyping(false);
+            }}
           >
             Login
           </Button>
@@ -35,14 +43,21 @@ export function LoginPage({ onGoVerify2FA, onGoDashboard }: LoginPageProps) {
               "h-10",
               activeTab === "register" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground",
             )}
-            onClick={() => setActiveTab("register")}
+            onClick={() => {
+              setActiveTab("register");
+              setIsPasswordTyping(false);
+            }}
           >
             Register
           </Button>
         </div>
 
         {activeTab === "login" ? (
-          <LoginForm onNeed2FA={onGoVerify2FA} onSuccess={onGoDashboard} />
+          <LoginForm
+            onNeed2FA={onGoVerify2FA}
+            onSuccess={onGoDashboard}
+            onPasswordTypingChange={setIsPasswordTyping}
+          />
         ) : (
           <RegisterForm onNeed2FA={onGoVerify2FA} />
         )}
